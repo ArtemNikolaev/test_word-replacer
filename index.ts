@@ -1,23 +1,16 @@
-const insertIntoArray = (arr, index, newItem) => [
-  // part of the array before the specified index
-  ...arr.slice(0, index),
-  // inserted item
-  newItem,
-  // part of the array after the specified index
-  ...arr.slice(index),
-];
+import { logger } from "./src/logger";
+
+const getDp = (i, j, dp) => {
+  if (i < 0 && j < 0) return 0;
+  if (i < 0) return j + 1;
+  if (j < 0) return i + 1;
+  return dp[i][j];
+};
 
 const minimalDistance = (word1, word2) => {
   const n = word1.length;
   const m = word2.length;
   const dp = Array(n);
-
-  const getDp = (i, j, dp) => {
-    if (i < 0 && j < 0) return 0;
-    if (i < 0) return j + 1;
-    if (j < 0) return i + 1;
-    return dp[i][j];
-  };
 
   for (let i = 0; i < n; i++) {
     dp[i] = Array(m);
@@ -31,12 +24,12 @@ const minimalDistance = (word1, word2) => {
   }
 
   let distance = getDp(n - 1, m - 1, dp);
-  console.log(distance);
+  logger.info(distance);
   let curI = n - 1;
   let curJ = m - 1;
   let curWord = Array.from(word2);
 
-  console.log(curWord.join(""));
+  logger.info(curWord.join(""));
   while (distance > 0) {
     const del = getDp(curI, curJ - 1, dp);
     const insert = getDp(curI - 1, curJ, dp);
@@ -46,17 +39,17 @@ const minimalDistance = (word1, word2) => {
       curI -= 1;
       curJ -= 1;
       distance = replace;
-      console.log(curWord.join(""));
+      logger.info(curWord.join(""));
     } else if (del < distance) {
       curWord[curJ] = "";
       curJ -= 1;
       distance = del;
-      console.log(curWord.join(""));
+      logger.info(curWord.join(""));
     } else if (insert < distance) {
-      curWord = insertIntoArray(curWord, curJ + 1, word1[curI]);
+      curWord[curJ + 1] = word1[curI];
       curI -= 1;
       distance = insert;
-      console.log(curWord.join(""));
+      logger.info(curWord.join(""));
     } else {
       curI -= 1;
       curJ -= 1;
