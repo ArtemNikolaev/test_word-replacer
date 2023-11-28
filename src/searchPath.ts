@@ -1,79 +1,32 @@
-import { ACTIONS_TYPE, ACTION } from "./utils";
+import { ACTION, WORD_INDEX } from "./utils";
+import { createPath } from "./createPath";
+import { selectFasterPath } from "./selectFasterPath";
 
-type PATH = {
-  nextWord2Index: number;
-  stop: boolean;
-  steps: number;
-  actions: ACTION[];
-};
-type DEFAULT_PATH = Omit<PATH, "nextWord2Index">;
+export function searchPath(word1: string, word2: string): ACTION[] {
+  if (typeof word1 != "string" || typeof word2 != "string") {
+    throw new Error('("Wrong Function Parameters!")');
+  }
 
-export function searchPath(word1, word2): ACTION[] {
-  const allPaths = [];
-  const defaultPath: DEFAULT_PATH = {
-    stop: false,
-    steps: 0,
-    actions: [],
-  };
+  const word1Array = word1.split("");
+  const word2Array = word2.split("");
 
-  word1.split("").forEach((word1Letter, word1Index, word1Array) => {
-    allPaths.forEach((path) => {
-      if (path.stop) {
-        path.actions.push({ action: ACTIONS_TYPE.DELETE });
-        path.steps++;
+  let resultPath: ACTION[] = createPath(
+    <WORD_INDEX>{ word: word1Array, index: 0 },
+    <WORD_INDEX>{ word: word2Array, index: 0 },
+  );
 
-        return;
+  word2Array.forEach((w2Letter, w2LetterIndex, w2Array) => {
+    word1Array.forEach((w1Letter, w1LetterIndex, w1Array) => {
+      if (w2Letter === w1Letter) {
+        const path = createPath(
+          <WORD_INDEX>{ word: w1Array, index: w1LetterIndex },
+          <WORD_INDEX>{ word: w2Array, index: w2LetterIndex },
+        );
+
+        resultPath = selectFasterPath(resultPath, path);
       }
-
-      if (word1Letter === word2[path.nextWord2Index]) {
-        path.actions.push({ action: ACTIONS_TYPE.DO_NOTHING });
-      } else {
-        path.actions.push({
-          action: ACTIONS_TYPE.REPLACE,
-          value: word2[path.nextWord2Index],
-        });
-        path.steps++;
-      }
-
-      path.nextWord2Index++;
-
-      if (path.nextWord2Index === word2.length) {
-        path.stop = true;
-      }
-
-      if (word1Index + 1 === word1Array.length) {
-        for (; path.nextWord2Index < word2.length; path.nextWord2Index++) {
-          path.actions.push({
-            action: ACTIONS_TYPE.DELETE,
-            value: word2[path.nextWord2Index],
-          });
-          path.steps++;
-        }
-
-        path.stop = true;
-      }
-    });
-
-    if (word1Letter === word1[0]) {
-      const path: PATH = Object.assign(
-        {},
-        <DEFAULT_PATH>structuredClone(defaultPath),
-        {
-          nextWord2Index: 1,
-        },
-      );
-      path.actions.push(<ACTION>{
-        action: ACTIONS_TYPE.DO_NOTHING,
-      });
-      allPaths.push(path);
-    }
-    defaultPath.steps++;
-    defaultPath.actions.push(<ACTION>{
-      action: ACTIONS_TYPE.DELETE,
     });
   });
 
-  return allPaths.sort((arr1: PATH, arr2: PATH): number =>
-    arr1.steps > arr2.steps ? 1 : -1,
-  )[0].actions;
+  return resultPath;
 }

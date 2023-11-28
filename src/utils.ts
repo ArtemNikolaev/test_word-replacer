@@ -7,5 +7,10 @@ export enum ACTIONS_TYPE {
 
 export type ACTION = {
   action: ACTIONS_TYPE;
-  value: string | undefined;
+  value?: string;
+};
+
+export type WORD_INDEX = {
+  word: string[];
+  index: number;
 };
