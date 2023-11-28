@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.0] - 2023-11-28
 ### Added
 - code linting
 - main functionality
 - tests
+
+[v1.0.0]: https://github.com/ArtemNikolaev/test_word-replacer/releases/tag/v1.0.0
